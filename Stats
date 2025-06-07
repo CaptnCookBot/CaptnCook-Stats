@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaptnCook — Winrate Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0B0B0F;
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00FFA3, #9945FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 255, 163, 0.3);
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .table-section {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(153, 69, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #9945FF;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(153, 69, 255, 0.5);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(153, 69, 255, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        th {
+            background: linear-gradient(135deg, #00FFA3, #00CC82);
+            color: #0B0B0F;
+            font-weight: 600;
+            text-align: center;
+            padding: 18px 25px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            text-shadow: none;
+        }
+
+        td {
+            padding: 18px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 400;
+            font-size: 0.95rem;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 255, 163, 0.08);
+            box-shadow: 0 0 25px rgba(0, 255, 163, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .winrate-cell {
+            font-weight: 600;
+            color: #00FFA3;
+            text-shadow: 0 0 10px rgba(0, 255, 163, 0.3);
+        }
+
+        .wins-cell {
+            color: #9945FF;
+            font-weight: 500;
+        }
+
+        .calls-cell {
+            color: #cccccc;
+        }
+
+        .month-cell, .week-cell, .day-cell {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .avg-multiple-cell {
+            color: #9945FF;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(153, 69, 255, 0.3);
+        }
+
+        /* Daily table specific styles */
+        .daily-table th {
+            padding: 12px 8px;
+            font-size: 0.85rem;
+        }
+
+        .daily-table td {
+            padding: 12px 8px;
+            font-size: 0.85rem;
+        }
+
+        /* VIP Section Styles */
+        .vip-section {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(153, 69, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vip-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 11, 15, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .lock-icon {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #00FFA3, #9945FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(0, 255, 163, 0.5);
+        }
+
+        .vip-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(153, 69, 255, 0.5);
+            line-height: 1.5;
+        }
+
+        .vip-text .highlight {
+            background: linear-gradient(135deg, #00FFA3, #9945FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .blurred-table {
+            filter: blur(8px);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .table-section, .vip-section {
+                padding: 20px;
+            }
+            
+            .table-title {
+                font-size: 1.5rem;
+            }
+            
+            th, td {
+                padding: 15px 12px;
+                font-size: 0.9rem;
+            }
+
+            .daily-table th, .daily-table td {
+                padding: 8px 4px;
+                font-size: 0.75rem;
+            }
+
+            .lock-icon {
+                font-size: 3rem;
+            }
+
+            .vip-text {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .dashboard {
+                padding: 0 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+
+            .daily-table th, .daily-table td {
+                padding: 6px 2px;
+                font-size: 0.65rem;
+            }
+
+            .lock-icon {
+                font-size: 2.5rem;
+            }
+
+            .vip-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Hover effect for table section */
+        .table-section:hover, .vip-section:hover {
+            border-color: rgba(153, 69, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(153, 69, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>CaptnCook — Winrate Dashboard</h1>
+            <p>Performance analytics since March 2025</p>
+        </div>
+
+        <!-- Monthly Stats Content -->
+        <div class="table-section">
+            <h2 class="table-title">Monthly Performance</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Calls</th>
+                            <th>Wins</th>
+                            <th>Winrate</th>
+                            <th>Average Multiple</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="month-cell">2025-03</td>
+                            <td class="calls-cell">226</td>
+                            <td class="wins-cell">117</td>
+                            <td class="winrate-cell">51.77%</td>
+                            <td class="avg-multiple-cell">11.52</td>
+                        </tr>
+                        <tr>
+                            <td class="month-cell">2025-04</td>
+                            <td class="calls-cell">206</td>
+                            <td class="wins-cell">117</td>
+                            <td class="winrate-cell">56.80%</td>
+                            <td class="avg-multiple-cell">15.34</td>
+                        </tr>
+                        <tr>
+                            <td class="month-cell">2025-05</td>
+                            <td class="calls-cell">194</td>
+                            <td class="wins-cell">97</td>
+                            <td class="winrate-cell">50.00%</td>
+                            <td class="avg-multiple-cell">13.12</td>
+                        </tr>
+                        <tr>
+                            <td class="month-cell">2025-06</td>
+                            <td class="calls-cell">56</td>
+                            <td class="wins-cell">25</td>
+                            <td class="winrate-cell">44.64%</td>
+                            <td class="avg-multiple-cell">10.89</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Weekly Stats Content -->
+        <div class="table-section">
+            <h2 class="table-title">Weekly Performance</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Calls</th>
+                            <th>Wins</th>
+                            <th>Winrate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="week-cell">2025-13</td>
+                            <td class="calls-cell">50</td>
+                            <td class="wins-cell">37</td>
+                            <td class="winrate-cell">74.00%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-14</td>
+                            <td class="calls-cell">39</td>
+                            <td class="wins-cell">24</td>
+                            <td class="winrate-cell">61.54%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-15</td>
+                            <td class="calls-cell">69</td>
+                            <td class="wins-cell">40</td>
+                            <td class="winrate-cell">57.97%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-16</td>
+                            <td class="calls-cell">37</td>
+                            <td class="wins-cell">18</td>
+                            <td class="winrate-cell">48.65%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-17</td>
+                            <td class="calls-cell">45</td>
+                            <td class="wins-cell">19</td>
+                            <td class="winrate-cell">42.22%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-18</td>
+                            <td class="calls-cell">32</td>
+                            <td class="wins-cell">16</td>
+                            <td class="winrate-cell">50.00%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-19</td>
+                            <td class="calls-cell">25</td>
+                            <td class="wins-cell">16</td>
+                            <td class="winrate-cell">64.00%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-20</td>
+                            <td class="calls-cell">59</td>
+                            <td class="wins-cell">28</td>
+                            <td class="winrate-cell">47.46%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-21</td>
+                            <td class="calls-cell">56</td>
+                            <td class="wins-cell">26</td>
+                            <td class="winrate-cell">46.43%</td>
+                        </tr>
+                        <tr>
+                            <td class="week-cell">2025-22</td>
+                            <td class="calls-cell">56</td>
+                            <td class="wins-cell">25</td>
+                            <td class="winrate-cell">44.64%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Daily Stats Content -->
+        <div class="table-section">
+            <h2 class="table-title">Daily Performance by Hour</h2>
+            <div class="table-wrapper">
+                <table class="daily-table">
+                    <thead>
+                        <tr>
+                            <th>Weekday</th>
+                            <th>00h-03h</th>
+                            <th>03h-06h</th>
+                            <th>06h-09h</th>
+                            <th>09h-12h</th>
+                            <th>12h-15h</th>
+                            <th>15h-18h</th>
+                            <th>18h-21h</th>
+                            <th>21h-24h</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="day-cell">Monday</td>
+                            <td class="winrate-cell">45.45%</td>
+                            <td class="winrate-cell">44.44%</td>
+                            <td class="winrate-cell">43.75%</td>
+                            <td class="winrate-cell">50.00%</td>
+                            <td class="winrate-cell">61.54%</td>
+                            <td class="winrate-cell">62.50%</td>
+                            <td class="winrate-cell">46.67%</td>
+                            <td class="winrate-cell">51.72%</td>
+                        </tr>
+                        <tr>
+                            <td class="day-cell">Tuesday</td>
+                            <td class="winrate-cell">37.50%</td>
+                            <td class="winrate-cell">33.33%</td>
+                            <td class="winrate-cell">42.86%</td>
+                            <td class="winrate-cell">50.00%</td>
+                            <td class="winrate-cell">66.67%</td>
+                            <td class="winrate-cell">26.67%</td>
+                            <td class="winrate-cell">60.87%</td>
+                            <td class="winrate-cell">57.14%</td>
+                        </tr>
+                        <tr>
+                            <td class="day-cell">Wednesday</td>
+                            <td class="winrate-cell">36.36%</td>
+                            <td class="winrate-cell">53.33%</td>
+                            <td class="winrate-cell">30.77%</td>
+                            <td class="winrate-cell">50.00%</td>
+                            <td class="winrate-cell">44.44%</td>
+                            <td class="winrate-cell">36.36%</td>
+                            <td class="winrate-cell">37.50%</td>
+                            <td class="winrate-cell">57.14%</td>
+                        </tr>
+                        <tr>
+                            <td class="day-cell">Thursday</td>
+                            <td class="winrate-cell">30.43%</td>
+                            <td class="winrate-cell">39.13%</td>
+                            <td class="winrate-cell">42.86%</td>
+                            <td class="winrate-cell">33.33%</td>
+                            <td class="winrate-cell">63.64%</td>
+                            <td class="winrate-cell">35.29%</td>
+                            <td class="winrate-cell">50.00%</td>
+                            <td class="winrate-cell">43.48%</td>
+                        </tr>
+                        <tr>
+                            <td class="day-cell">Friday</td>
+                            <td class="winrate-cell">36.36%</td>
+                            <td class="winrate-cell">26.67%</td>
+                            <td class="winrate-cell">54.55%</td>
+                            <td class="winrate-cell">37.50%</td>
+                            <td class="winrate-cell">30.00%</td>
+                            <td class="winrate-cell">46.67%</td>
+                            <td class="winrate-cell">43.48%</td>
+                            <td class="winrate-cell">55.00%</td>
+                        </tr>
+                        <tr>
+                            <td class="day-cell">Saturday</td>
+                            <td class="winrate-cell">57.14%</td>
+                            <td class="winrate-cell">41.18%</td>
+                            <td class="winrate-cell">60.00%</td>
+                            <td class="winrate-cell">75.00%</td>
+                            <td class="winrate-cell">55.56%</td>
+                            <td class="winrate-cell">62.50%</td>
+                            <td class="winrate-cell">33.33%</td>
+                            <td class="winrate-cell">69.23%</td>
+                        </tr>
+                        <tr>
+                            <td class="day-cell">Sunday</td>
+                            <td class="winrate-cell">60.00%</td>
+                            <td class="winrate-cell">33.33%</td>
+                            <td class="winrate-cell">37.50%</td>
+                            <td class="winrate-cell">75.00%</td>
+                            <td class="winrate-cell">72.73%</td>
+                            <td class="winrate-cell">56.25%</td>
+                            <td class="winrate-cell">50.00%</td>
+                            <td class="winrate-cell">44.44%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIP Stats Section -->
+        <div class="vip-section">
+            <div class="vip-overlay">
+                <div class="lock-icon">🔒</div>
+                <div class="vip-text">
+                    <span class="highlight">VIP Stats</span> — Only for VIP members<br>
+                    Ask <span class="highlight">@anavexia7</span> on Telegram to join.
+                </div>
+            </div>
+            
+            <div class="blurred-table">
+                <h2 class="table-title">VIP Monthly Performance</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Calls</th>
+                                <th>Wins</th>
+                                <th>Winrate</th>
+                                <th>Average Multiple</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="month-cell">2025-03</td>
+                                <td class="calls-cell">226</td>
+                                <td class="wins-cell">117</td>
+                                <td class="winrate-cell">51.77%</td>
+                                <td class="avg-multiple-cell">11.52</td>
+                            </tr>
+                            <tr>
+                                <td class="month-cell">2025-04</td>
+                                <td class="calls-cell">206</td>
+                                <td class="wins-cell">117</td>
+                                <td class="winrate-cell">56.80%</td>
+                                <td class="avg-multiple-cell">15.34</td>
+                            </tr>
+                            <tr>
+                                <td class="month-cell">2025-05</td>
+                                <td class="calls-cell">194</td>
+                                <td class="wins-cell">97</td>
+                                <td class="winrate-cell">50.00%</td>
+                                <td class="avg-multiple-cell">13.12</td>
+                            </tr>
+                            <tr>
+                                <td class="month-cell">2025-06</td>
+                                <td class="calls-cell">56</td>
+                                <td class="wins-cell">25</td>
+                                <td class="winrate-cell">44.64%</td>
+                                <td class="avg-multiple-cell">10.89</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
